@@ -1,92 +1,84 @@
 const express = require('express')
 const passport = require('passport')
+
 const Post = require('../models/post')
+const Comment = require('../models/comment')
+
 const customErrors = require('../../lib/custom_errors')
+
 const handle404 = customErrors.handle404
 const requireOwnership = customErrors.requireOwnership
+
 const removeBlanks = require('../../lib/remove_blank_fields')
 const requireToken = passport.authenticate('bearer', { session: false })
-
 const router = express.Router()
 
-// CREATE POSTS WHILE LOGGED IN
-router.post('/posts', requireToken, (req, res, next) => {
-  // set owner of new post to be current user
-  req.body.post.owner = req.user.id
+//
 
-  Post.create(req.body.post)
-    // respond to succesful `create` with status 201 and JSON of new "post"
-    .then(post => {
-      res.status(201).json({ post: post.toObject() })
-    })
-    // if an error occurs, pass it off to our error handler
-    // the error handler needs the error message and the `res` object so that it
-    // can send an error message back to the client
-    .catch(next)
-})
-
-// GET ALL POSTS WHILE NOT LOGGED IN
 router.get('/posts', (req, res, next) => {
   Post.find()
-    .populate('owner')
     .then(posts => {
       return posts.map(post => post.toObject())
     })
-    .then(posts => res.status(200).json({ posts: posts }))
+    .then(posts => {
+      res.json({ posts })
+    })
     .catch(next)
 })
 
-// GET USERS SPECIFIC POSTS WHILE LOGGED IN
-// /posts/5a7db6c74d55bc51bdf39793
-router.get('/posts-user/:id', requireToken, (req, res, next) => {
-  // req.params.id will be set based on the `:id` in the route
-  Post.findById(req.params.id)
-    .populate('owner')
+// SHOW //// GET /posts/5a7db6c74d55bc51bdf39793
+router.get('/posts/:id', (req, res, next) => {
+  const id = req.params.id
+  // keep track of doc
+  let post
+  Post.findById(id)
     .then(handle404)
-    // if `findById` is succesful, respond with 200 and "post" JSON
-    .then(post => res.status(200).json({ post: post.toObject() }))
-    // if an error occurs, pass it to the handler
+    .then(foundPost => {
+      // store doc
+      post = foundPost.toObject()
+      // find all comments of doc w/ specific id
+      return Comment.find({ post: id })
+    })
+    .then(comments => {
+      // add comments to doc object for serializing
+      post.comments = comments
+      res.json({ post })
+    })
     .catch(next)
 })
 
-// UPDATE USERS SPECIFIC POSTS WHILE LOGGED IN
-// PATCH /posts/5a7db6c74d55bc51bdf39793
-router.patch('/posts/:id', requireToken, removeBlanks, (req, res, next) => {
-  // if the client attempts to change the `owner` property by including a new
-  // owner, prevent that by deleting that key/value pair
-  delete req.body.post.owner
+// CREATE //// POST /posts
+router.post('/posts', requireToken, (req, res, next) => {
+  req.body.post.owner = req.user.id
+  Post.create(req.body.post)
+    .then(post => {
+      res.status(201).json({ post: post.toObject() })
+    })
+    .catch(next)
+})
 
+// UPDATE //// PATCH /posts/id
+router.patch('/posts/:id', requireToken, removeBlanks, (req, res, next) => {
+  delete req.body.post.owner
   Post.findById(req.params.id)
-    .populate('owner')
     .then(handle404)
     .then(post => {
-      // pass the `req` object and the Mongoose record to `requireOwnership`
-      // it will throw an error if the current user isn't the owner
       requireOwnership(req, post)
-
-      // pass the result of Mongoose's `.update` to the next `.then`
       return post.update(req.body.post)
     })
-    // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
-    // if an error occurs, pass it to the handler
     .catch(next)
 })
 
-// DESTROY POSTS WHILE LOGGED IN BELONGING TO SPECIFIC USER
-// DELETE /posts/5a7db6c74d55bc51bdf39793
+// DESTROY //// DELETE /posts/id
 router.delete('/posts/:id', requireToken, (req, res, next) => {
   Post.findById(req.params.id)
     .then(handle404)
     .then(post => {
-      // throw an error if current user doesn't own `post`
       requireOwnership(req, post)
-      // delete the post ONLY IF the above didn't throw
       post.remove()
     })
-    // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))
-    // if an error occurs, pass it to the handler
     .catch(next)
 })
 

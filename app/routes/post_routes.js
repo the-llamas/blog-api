@@ -1,6 +1,6 @@
 const express = require('express')
 const passport = require('passport')
-const Post = require('../models/example')
+const Post = require('../models/post')
 const customErrors = require('../../lib/custom_errors')
 const handle404 = customErrors.handle404
 const requireOwnership = customErrors.requireOwnership
@@ -10,38 +10,15 @@ const requireToken = passport.authenticate('bearer', { session: false })
 
 const router = express.Router()
 
+// CREATE POSTS WHILE LOGGED IN
+router.post('/posts', requireToken, (req, res, next) => {
+  // set owner of new post to be current user
+  req.body.post.owner = req.user.id
 
-router.get('/examples', (req, res, next) => {
-  Post.find()
-    .then(examples => {
-      return examples.map(example => example.toObject())
-    })
-    .then(examples => res.status(200).json({ examples: examples }))
-    .catch(next)
-})
-
-// SHOW
-// GET /examples/5a7db6c74d55bc51bdf39793
-router.get('/examples/:id', requireToken, (req, res, next) => {
-  // req.params.id will be set based on the `:id` in the route
-  Post.findById(req.params.id)
-    .then(handle404)
-    // if `findById` is succesful, respond with 200 and "example" JSON
-    .then(example => res.status(200).json({ example: example.toObject() }))
-    // if an error occurs, pass it to the handler
-    .catch(next)
-})
-
-// CREATE
-// POST /examples
-router.post('/examples', requireToken, (req, res, next) => {
-  // set owner of new example to be current user
-  req.body.example.owner = req.user.id
-
-  Post.create(req.body.example)
-    // respond to succesful `create` with status 201 and JSON of new "example"
-    .then(example => {
-      res.status(201).json({ example: example.toObject() })
+  Post.create(req.body.post)
+    // respond to succesful `create` with status 201 and JSON of new "post"
+    .then(post => {
+      res.status(201).json({ post: post.toObject() })
     })
     // if an error occurs, pass it off to our error handler
     // the error handler needs the error message and the `res` object so that it
@@ -49,22 +26,44 @@ router.post('/examples', requireToken, (req, res, next) => {
     .catch(next)
 })
 
-// UPDATE
-// PATCH /examples/5a7db6c74d55bc51bdf39793
-router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
+// GET ALL POSTS WHILE NOT LOGGED IN
+router.get('/posts', (req, res, next) => {
+  Post.find()
+    .then(posts => {
+      return posts.map(post => post.toObject())
+    })
+    .then(posts => res.status(200).json({ posts: posts }))
+    .catch(next)
+})
+
+// GET USERS SPECIFIC POSTS WHILE LOGGED IN
+// /posts/5a7db6c74d55bc51bdf39793
+router.get('/posts-user/:id', requireToken, (req, res, next) => {
+  // req.params.id will be set based on the `:id` in the route
+  Post.findById(req.params.id)
+    .then(handle404)
+    // if `findById` is succesful, respond with 200 and "post" JSON
+    .then(post => res.status(200).json({ post: post.toObject() }))
+    // if an error occurs, pass it to the handler
+    .catch(next)
+})
+
+// UPDATE USERS SPECIFIC POSTS WHILE LOGGED IN
+// PATCH /posts/5a7db6c74d55bc51bdf39793
+router.patch('/posts/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.example.owner
+  delete req.body.post.owner
 
   Post.findById(req.params.id)
     .then(handle404)
-    .then(example => {
+    .then(post => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, example)
+      requireOwnership(req, post)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return example.update(req.body.example)
+      return post.update(req.body.post)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
@@ -72,16 +71,16 @@ router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
     .catch(next)
 })
 
-// DESTROY
-// DELETE /examples/5a7db6c74d55bc51bdf39793
-router.delete('/examples/:id', requireToken, (req, res, next) => {
+// DESTROY POSTS WHILE LOGGED IN BELONGING TO SPECIFIC USER
+// DELETE /posts/5a7db6c74d55bc51bdf39793
+router.delete('/posts/:id', requireToken, (req, res, next) => {
   Post.findById(req.params.id)
     .then(handle404)
-    .then(example => {
-      // throw an error if current user doesn't own `example`
-      requireOwnership(req, example)
-      // delete the example ONLY IF the above didn't throw
-      example.remove()
+    .then(post => {
+      // throw an error if current user doesn't own `post`
+      requireOwnership(req, post)
+      // delete the post ONLY IF the above didn't throw
+      post.remove()
     })
     // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))

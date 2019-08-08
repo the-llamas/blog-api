@@ -28,18 +28,19 @@ router.post('/posts', requireToken, (req, res, next) => {
     .catch(next)
 })
 
-// GET ALL POSTS WHILE NOT LOGGED IN
 router.get('/posts', (req, res, next) => {
   Post.find()
     .populate('comment')
     .populate('owner')
     .then(posts => {
-      console.log(posts._id)
       return posts.map(post => post.toObject())
     })
     .then(posts => res.status(200).json({ posts: posts }))
     .catch(next)
 })
+
+
+
 
 // GET USERS SPECIFIC POSTS WHILE LOGGED IN
 // /posts/5a7db6c74d55bc51bdf39793
@@ -72,7 +73,6 @@ router.get('/posts/:id', (req, res, next) => {
     })
     .then(comments => {
       post.comment = comments
-
       res.json({post})
     })
     .catch(next)

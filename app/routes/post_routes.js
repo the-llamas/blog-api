@@ -7,7 +7,6 @@ const requireOwnership = customErrors.requireOwnership
 const removeBlanks = require('../../lib/remove_blank_fields')
 const requireToken = passport.authenticate('bearer', { session: false })
 
-
 const router = express.Router()
 
 // CREATE POSTS WHILE LOGGED IN
@@ -29,6 +28,7 @@ router.post('/posts', requireToken, (req, res, next) => {
 // GET ALL POSTS WHILE NOT LOGGED IN
 router.get('/posts', (req, res, next) => {
   Post.find()
+    .populate('owner')
     .then(posts => {
       return posts.map(post => post.toObject())
     })
@@ -41,6 +41,7 @@ router.get('/posts', (req, res, next) => {
 router.get('/posts-user/:id', requireToken, (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
   Post.findById(req.params.id)
+    .populate('owner')
     .then(handle404)
     // if `findById` is succesful, respond with 200 and "post" JSON
     .then(post => res.status(200).json({ post: post.toObject() }))
@@ -56,6 +57,7 @@ router.patch('/posts/:id', requireToken, removeBlanks, (req, res, next) => {
   delete req.body.post.owner
 
   Post.findById(req.params.id)
+    .populate('owner')
     .then(handle404)
     .then(post => {
       // pass the `req` object and the Mongoose record to `requireOwnership`

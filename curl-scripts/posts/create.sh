@@ -11,7 +11,8 @@ curl "${API}${URL_PATH}" \
   --data '{
     "post": {
       "text": "'"${TEXT}"'",
-      "title": "'"${TITLE}"'"
+      "title": "'"${TITLE}"'",
+      "comment": "'"${COMMENT}"'"
     }
   }'
 

@@ -1,6 +1,7 @@
 const express = require('express')
 const passport = require('passport')
 const Comment = require('../models/comment')
+const Post = require('../models/post')
 const customErrors = require('../../lib/custom_errors')
 const handle404 = customErrors.handle404
 const requireOwnership = customErrors.requireOwnership
@@ -13,6 +14,7 @@ const router = express.Router()
 router.get('/comments', (req, res, next) => {
   Comment.find()
     .populate('owner')
+    .populate('post')
     .then(comments => {
       return comments.map(comment => comment.toObject())
     })
@@ -39,6 +41,7 @@ router.post('/comments', requireToken, (req, res, next) => {
 // /comments/5a7db6c74d55bc51bdf39793
 router.get('/comments-user/:id', requireToken, (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
+
   Comment.findById(req.params.id)
     .populate('owner')
     .then(handle404)

@@ -34,7 +34,6 @@ router.get('/posts', (req, res, next) => {
     .populate('comment')
     .populate('owner')
     .then(posts => {
-      console.log(posts._id)
       return posts.map(post => post.toObject())
     })
     .then(posts => res.status(200).json({ posts: posts }))

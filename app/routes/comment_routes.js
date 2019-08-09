@@ -57,16 +57,6 @@ router.post('/comments', requireToken, (req, res, next) => {
     .then(comment => {
       let id = comment._id
       let postID = comment.post
-      // Post.findById(postID).exec(function (err, foundPost) {
-      //   if (err) throw err
-      //   console.log(foundPost)
-      //   console.log(typeof id)
-      //   console.log(postID)
-      //   foundPost.comment.push(id)
-      // })
-      // console.log(Post.findById(postID))
-      // res.status(201).json({ comment: comment.toObject() })
-      // comment
       Post.findById(postID)
         .then(handle404)
         .then(foundPost => {
@@ -78,7 +68,6 @@ router.post('/comments', requireToken, (req, res, next) => {
         .then((post) => {
           res.status(200).json({post})
         })
-
         .catch(next)
     })
 

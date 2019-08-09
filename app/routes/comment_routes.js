@@ -94,7 +94,6 @@ router.patch('/comments/:id', requireToken, removeBlanks, (req, res, next) => {
   delete req.body.comment.owner
 
   Comment.findById(req.params.id)
-    .populate('owner')
     .then(handle404)
     .then(comment => {
       // pass the `req` object and the Mongoose record to `requireOwnership`

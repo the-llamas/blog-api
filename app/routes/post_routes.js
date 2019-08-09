@@ -21,9 +21,7 @@ router.get('/posts', (req, res, next) => {
     .then(posts => {
       return posts.map(post => post.toObject())
     })
-    .then(posts => {
-      res.json({ posts })
-    })
+    .then(posts => res.status(200).json({posts: posts}))
     .catch(next)
 })
 
@@ -58,7 +56,7 @@ router.get('/posts/:id', (req, res, next) => {
     })
     .then(comments => {
       post.comment = comments
-      res.json({post})
+      res.status(200).json({post})
     })
     .catch(next)
   // Post.findById(req.params.id)

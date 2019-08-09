@@ -14,7 +14,7 @@ const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
 //
-router.get('/', (req, res, next) => {
+router.get('/posts', (req, res, next) => {
   Post.find()
     .populate('comment')
     .populate('owner')

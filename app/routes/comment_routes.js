@@ -50,10 +50,12 @@ router.post('/comments', requireToken, (req, res, next) => {
         .then(foundPost => {
           foundPost.comment.push(id)
           let post = foundPost
-          return foundPost.update(post)
+          foundPost.update(post)
+          console.log(foundPost)
+          return comment
         })
-        .then((post) => {
-          res.status(200).json({post})
+        .then((comment) => {
+          res.status(200).json({comment})
         })
 
         .catch(next)
@@ -67,7 +69,6 @@ router.get('/comments-user/:id', requireToken, (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
 
   Comment.findById(req.params.id)
-    .populate('owner')
     .then(handle404)
     // if `findById` is succesful, respond with 200 and "comment" JSON
     .then(comment => res.status(200).json({ comment: comment.toObject() }))
@@ -83,11 +84,12 @@ router.patch('/comments/:id', requireToken, removeBlanks, (req, res, next) => {
   delete req.body.comment.owner
 
   Comment.findById(req.params.id)
-    .populate('owner')
     .then(handle404)
     .then(comment => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
+      console.log('Req', req.user)
+      console.log('Comment', comment)
       requireOwnership(req, comment)
 
       // pass the result of Mongoose's `.update` to the next `.then`

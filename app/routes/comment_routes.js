@@ -1,10 +1,4 @@
-// router.get('/comments/:id', (req, res, next) => {
-//   Comment.findById(req.params.id)
-//     .populate('post')
-//     .then(handle404)
-//     .then(comment => res.status(200).json({ comment: comment.toObject() }))
-//     .catch(next)
-// })
+
 // Express docs: http://expressjs.com/en/api.html
 const express = require('express')
 const passport = require('passport')
@@ -44,15 +38,13 @@ router.get('/comments/:id', (req, res, next) => {
 })
 
 // CREATE //// POST /comments
-router.post('/comments', requireToken, (req, res, next) => {
-  req.body.comment.owner = req.user.id
-  Comment.create(req.body.comment)
-    .then(comment => {
-      res.status(201).json({ comment: comment.toObject() })
-    })
+router.get('/comments/:id', (req, res, next) => {
+  Comment.findById(req.params.id)
+    .populate('post')
+    .then(handle404)
+    .then(comment => res.status(200).json({ comment: comment.toObject() }))
     .catch(next)
 })
-
 // UPDATE //// PATCH /comments/id
 router.patch('/comments/:id', requireToken, removeBlanks, (req, res, next) => {
   delete req.body.comment.owner

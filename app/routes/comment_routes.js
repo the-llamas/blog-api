@@ -1,8 +1,16 @@
+// router.get('/comments/:id', (req, res, next) => {
+//   Comment.findById(req.params.id)
+//     .populate('post')
+//     .then(handle404)
+//     .then(comment => res.status(200).json({ comment: comment.toObject() }))
+//     .catch(next)
+// })
+// Express docs: http://expressjs.com/en/api.html
 const express = require('express')
 const passport = require('passport')
 
 const Comment = require('../models/comment')
-const Post = require('../models/post')
+
 const customErrors = require('../../lib/custom_errors')
 
 const handle404 = customErrors.handle404
@@ -16,7 +24,6 @@ const router = express.Router()
 
 router.get('/comments', (req, res, next) => {
   Comment.find()
-    .populate('owner')
     .populate('post')
     .then(comments => {
       return comments.map(comment => comment.toObject())
@@ -35,55 +42,14 @@ router.get('/comments/:id', (req, res, next) => {
     .then(comment => res.status(200).json({ comment: comment.toObject() }))
     .catch(next)
 })
-// CREATE POSTS WHILE LOGGED IN
-// router.post('/comments', requireToken, (req, res, next) => {
-//   // set owner of new comment to be current user
-//   req.body.comment.owner = req.user.id
-//
-//   Comment.create(req.body.comment)
-//     // respond to succesful `create` with status 201 and JSON of new "comment"
-//     .then(comment => {
-//       res.status(201).json({ comment: comment.toObject() })
-//     })
-//     // if an error occurs, pass it off to our error handler
-//     // the error handler needs the error message and the `res` object so that it
-//     // can send an error message back to the client
-//     .catch(next)
-// })
 
+// CREATE //// POST /comments
 router.post('/comments', requireToken, (req, res, next) => {
   req.body.comment.owner = req.user.id
   Comment.create(req.body.comment)
     .then(comment => {
-      let id = comment._id
-      let postID = comment.post
-      Post.findById(postID)
-        .then(handle404)
-        .then(foundPost => {
-          foundPost.comment.push(id)
-          let post = foundPost
-          console.log(post)
-          return foundPost.update(post)
-        })
-        .then((post) => {
-          res.status(200).json({post})
-        })
-        .catch(next)
+      res.status(201).json({ comment: comment.toObject() })
     })
-
-    .catch(next)
-})
-// GET USERS SPECIFIC POSTS WHILE LOGGED IN
-// /comments/5a7db6c74d55bc51bdf39793
-router.get('/comments-user/:id', requireToken, (req, res, next) => {
-  // req.params.id will be set based on the `:id` in the route
-
-  Comment.findById(req.params.id)
-    .populate('owner')
-    .then(handle404)
-    // if `findById` is succesful, respond with 200 and "comment" JSON
-    .then(comment => res.status(200).json({ comment: comment.toObject() }))
-    // if an error occurs, pass it to the handler
     .catch(next)
 })
 

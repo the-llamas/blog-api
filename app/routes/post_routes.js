@@ -39,9 +39,6 @@ router.get('/posts', (req, res, next) => {
     .catch(next)
 })
 
-
-
-
 // GET USERS SPECIFIC POSTS WHILE LOGGED IN
 // /posts/5a7db6c74d55bc51bdf39793
 

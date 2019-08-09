@@ -14,9 +14,10 @@ const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
 //
-
 router.get('/posts', (req, res, next) => {
   Post.find()
+    .populate('comment')
+    .populate('owner')
     .then(posts => {
       return posts.map(post => post.toObject())
     })
@@ -26,25 +27,48 @@ router.get('/posts', (req, res, next) => {
     .catch(next)
 })
 
-// SHOW //// GET /posts/5a7db6c74d55bc51bdf39793
+// GET USERS SPECIFIC POSTS WHILE LOGGED IN
+// /posts/5a7db6c74d55bc51bdf39793
+
+// router.get('/posts/:id', (req, res, next) => {
+//   let foundPost
+//   const id = req.params.id
+//   Post.find()
+//     .populate('comments')
+//     .then(posts => {
+//       foundPost = posts.toObject()
+//       return Comment.find({Post: {_id: id}})
+//     })
+//     .then(comment => {
+//       foundPost.comment = comment
+//       res.json({foundPost})
+//     })
+//     .catch(next)
+// })
 router.get('/posts/:id', (req, res, next) => {
+  // req.params.id will be set based on the `:id` in the route
   const id = req.params.id
-  // keep track of doc
+
   let post
   Post.findById(id)
     .then(handle404)
     .then(foundPost => {
-      // store doc
       post = foundPost.toObject()
-      // find all comments of doc w/ specific id
-      return Comment.find({ post: id })
+      return Comment.find({post: id})
     })
     .then(comments => {
-      // add comments to doc object for serializing
-      post.comments = comments
-      res.json({ post })
+      post.comment = comments
+      res.json({post})
     })
     .catch(next)
+  // Post.findById(req.params.id)
+  //   .populate('comment')
+  //   .populate('owner')
+  //   .then(handle404)
+  //   // if `findById` is succesful, respond with 200 and "post" JSON
+  //   .then(post => res.status(200).json({ post: post.toObject() }))
+  //   // if an error occurs, pass it to the handler
+  //   .catch(next)
 })
 
 // CREATE //// POST /posts

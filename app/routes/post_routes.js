@@ -10,7 +10,6 @@ const removeBlanks = require('../../lib/remove_blank_fields')
 const requireToken = passport.authenticate('bearer', { session: false })
 
 const router = express.Router()
-
 // CREATE POSTS WHILE LOGGED IN
 router.post('/posts', requireToken, (req, res, next) => {
   // set owner of new post to be current user

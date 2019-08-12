@@ -71,6 +71,7 @@ app.use(commentRoutes)
 app.use(errorHandler)
 
 // run API on designated port (4741 in this case)
+app.listen(port, () => {})
 
 // needed for testing
 module.exports = app

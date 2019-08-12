@@ -39,23 +39,6 @@ router.get('/posts', (req, res, next) => {
 })
 
 // GET USERS SPECIFIC POSTS WHILE LOGGED IN
-// /posts/5a7db6c74d55bc51bdf39793
-
-// router.get('/posts/:id', (req, res, next) => {
-//   let foundPost
-//   const id = req.params.id
-//   Post.find()
-//     .populate('comments')
-//     .then(posts => {
-//       foundPost = posts.toObject()
-//       return Comment.find({Post: {_id: id}})
-//     })
-//     .then(comment => {
-//       foundPost.comment = comment
-//       res.json({foundPost})
-//     })
-//     .catch(next)
-// })
 router.get('/posts/:id', (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
   const id = req.params.id

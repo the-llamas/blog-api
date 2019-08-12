@@ -21,21 +21,6 @@ router.get('/comments', (req, res, next) => {
     .then(comments => res.status(200).json({ comments: comments }))
     .catch(next)
 })
-// CREATE POSTS WHILE LOGGED IN
-// router.post('/comments', requireToken, (req, res, next) => {
-//   // set owner of new comment to be current user
-//   req.body.comment.owner = req.user.id
-//
-//   Comment.create(req.body.comment)
-//     // respond to succesful `create` with status 201 and JSON of new "comment"
-//     .then(comment => {
-//       res.status(201).json({ comment: comment.toObject() })
-//     })
-//     // if an error occurs, pass it off to our error handler
-//     // the error handler needs the error message and the `res` object so that it
-//     // can send an error message back to the client
-//     .catch(next)
-// })
 
 router.post('/comments', requireToken, (req, res, next) => {
   // set owner of new comment to be current user
@@ -45,16 +30,6 @@ router.post('/comments', requireToken, (req, res, next) => {
     .then(comment => {
       let id = comment._id
       let postID = comment.post
-      // Post.findById(postID).exec(function (err, foundPost) {
-      //   if (err) throw err
-      //   console.log(foundPost)
-      //   console.log(typeof id)
-      //   console.log(postID)
-      //   foundPost.comment.push(id)
-      // })
-      // console.log(Post.findById(postID))
-      // res.status(201).json({ comment: comment.toObject() })
-      // comment
       Post.findById(postID)
         .then(handle404)
         .then(foundPost => {

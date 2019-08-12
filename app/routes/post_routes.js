@@ -13,7 +13,7 @@ const removeBlanks = require('../../lib/remove_blank_fields')
 const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
-//
+// Posts
 
 router.get('/posts', (req, res, next) => {
   Post.find()

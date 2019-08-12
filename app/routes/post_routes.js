@@ -13,12 +13,19 @@ const removeBlanks = require('../../lib/remove_blank_fields')
 const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
-//
+// Posts
 
 router.get('/posts', (req, res, next) => {
   Post.find()
-    .populate('comment')
     .populate('owner')
+    .populate({
+      path: 'comment',
+      model: 'Comment',
+      populate: {
+        path: 'owner',
+        model: 'User'
+      }
+    })
     .then(posts => {
       return posts.map(post => post.toObject())
     })

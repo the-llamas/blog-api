@@ -27,6 +27,8 @@ Our initial planning process began with creating our Entity Relationship Diagram
 
 On day 2 of the project, our team encountered a problem with updating a specific comment on a post that belonged to the user logged in. We solved this problem by using populate() available from mongoose.
 
+On days 2-3 our team experienced trouble getting the edit/delete/new-comment buttons to show only on particular posts at varying times. The logic was updated so the user always has a token, but when signed out, it becomes an invalid token, allowing it to be referenced, but never equal to any of the tokens associated with a user. This eliminated indexing errors, but the overarching error was a missing ‘require’
+
 ## Wireframes
 ​https://imgur.com/a/YQYY1xG
 
@@ -65,4 +67,11 @@ On day 2 of the project, our team encountered a problem with updating a specific
 | DELETE | `/comments/:id`    | N/A               | **Token** | delete post comment |
 
 ## Unsolved Problems
-We would love to add in a feature so that each user could add in avatar and save their profile picture. We are also going over the idea of adding a "follow" feature, so that each user can follow a specific user of their choice.
+In the future our team would like to solve the following problems:
+
+  - Ability for users to upload avatars
+  - Ability for users to ‘follow’ other users
+  - Show posts by post title or keywords
+  - Show posts by user
+  - More CSS
+  - Ability to favorite or like posts/comments

@@ -1,8 +1,7 @@
 # Llama Blogging Platform
-Link to Front End GitHub: https://github.com/the-llamas/Front-End---Blog
-Link to Deployed App: https://the-llamas.github.io/Front-End---Blog
-Link to Back End GitHub:https://github.com/the-llamas/blog-api
-Link to Heroku App: https://blog-api-back-end.herokuapp.com
+Front-end [ [Repo](https://github.com/the-llamas/Front-End---Blog) / [Deployed](https://the-llamas.github.io/Front-End---Blog) ]
+
+Back-end [ [Repo](https://github.com/the-llamas/blog-api) / [Deployed](https://blog-api-back-end.herokuapp.com) ]
 ​
 ## Summary
 This is a blogging plaform for blogging about llamas!
@@ -14,7 +13,10 @@ Users can view posts, create posts, and interact by adding comments to any users
 - Javascript
 - MongoDB
 - Mongoose
-
+- Webpack
+- Bootstrap
+- Git
+- GitHub
 ​
 ## Planning
 Our initial planning process began with creating our Entity Relationship Diagram. Since our project required a user to have a relationship with blogs, and additionally for blogs to have relationships with both the user and comments, we initally planned on creating our blog collection first. Then upon blog collection creation success, we would make the collection for the comments and move forward from there.
@@ -30,7 +32,7 @@ On day 2 of the project, our team encountered a problem with updating a specific
 On days 2-3 our team experienced trouble getting the edit/delete/new-comment buttons to show only on particular posts at varying times. The logic was updated so the user always has a token, but when signed out, it becomes an invalid token, allowing it to be referenced, but never equal to any of the tokens associated with a user. This eliminated indexing errors, but the overarching error was a missing ‘require’
 
 ## Wireframes
-​https://imgur.com/a/YQYY1xG
+<img src="https://i.imgur.com/DXaBLZ5.png" width="100%" alt="Wireframes">
 
 ## User stories
 - As a user, I want to sign up with email and password.
@@ -44,7 +46,7 @@ On days 2-3 our team experienced trouble getting the edit/delete/new-comment but
 - When signed in, I want to delete my blog posts and comments.
 ​
 ## ERD
-​https://imgur.com/a/08YKk1E
+<img src="https://i.imgur.com/Mz3lQ1r.png" width="100%" alt="ERD">
 
 ## API Routes
 | Verb   | URI Pattern        | Request Body      | Headers   | Action              |
